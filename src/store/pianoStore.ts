@@ -8,6 +8,7 @@
  */
 
 import { synthEngine } from '../audio/SynthEngine'
+import { waterfallStore } from './waterfallStore'
 
 type Source = 'pointer' | 'keyboard' | 'midi'
 
@@ -22,16 +23,30 @@ class PianoStore {
       this.sources.set(noteId, s)
     }
     s.add(source)
-    if (!wasActive && !skipAudio) synthEngine.noteOn(noteId)
+
+    if (!wasActive) {
+      if (!skipAudio) synthEngine.noteOn(noteId)
+      
+      // Visuals
+      waterfallStore.spawnParticle(noteId)
+      if (source !== 'midi') {
+        waterfallStore.addManualNote(noteId)
+      }
+    }
   }
 
   noteOff(noteId: string, source: Source, skipAudio = false): void {
     const s = this.sources.get(noteId)
     if (!s) return
     s.delete(source)
+    
     if (s.size === 0) {
       this.sources.delete(noteId)
       if (!skipAudio) synthEngine.noteOff(noteId)
+      
+      if (source !== 'midi') {
+        waterfallStore.releaseManualNote(noteId)
+      }
     }
   }
 

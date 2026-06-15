@@ -2,22 +2,24 @@ import { useRef, useCallback, useState } from 'react'
 import * as THREE from 'three'
 import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
+import { RoundedBoxGeometry } from 'three-stdlib'
 import { pianoStore } from '../store/pianoStore'
 import { getKeyLabel } from '../constants/keyMap'
 
 /* ── Geometry ── */
 const WHITE_W = 1.0, WHITE_H = 0.9, WHITE_D = 6.0
 const BLACK_W = 0.55, BLACK_H = 0.6, BLACK_D = 3.8
-const PRESS_DEPTH = 0.12
+const PRESS_DEPTH = 0.15
 
-const whiteGeo = new THREE.BoxGeometry(WHITE_W, WHITE_H, WHITE_D)
-const blackGeo = new THREE.BoxGeometry(BLACK_W, BLACK_H, BLACK_D)
+// Subtly beveled geometries for natural specular highlights
+const whiteGeo = new RoundedBoxGeometry(WHITE_W, WHITE_H, WHITE_D, 4, 0.05)
+const blackGeo = new RoundedBoxGeometry(BLACK_W, BLACK_H, BLACK_D, 4, 0.04)
 
 /* ── Color targets ── */
-const WHITE_REST  = new THREE.Color('#e8e8e8')
-const WHITE_PRESS = new THREE.Color('#c8c8cc')
-const BLACK_REST  = new THREE.Color('#1a1a1a')
-const BLACK_PRESS = new THREE.Color('#2e2e34')
+const WHITE_REST  = new THREE.Color('#fafafa') // Porcelain finish
+const WHITE_PRESS = new THREE.Color('#e4e4e7')
+const BLACK_REST  = new THREE.Color('#121214') // Matte ebony
+const BLACK_PRESS = new THREE.Color('#18181b')
 const EMISSIVE_ON = new THREE.Color('#444450')
 const EMISSIVE_OFF = new THREE.Color('#000000')
 
@@ -110,7 +112,8 @@ export default function PianoKey({ noteId, isBlack, position }: PianoKeyProps) {
     if (!mesh || !mat) return
 
     const active = pianoStore.isActive(noteId)
-    const speed  = active ? 22 : 14
+    // Swift descent (30), smooth spring-back (10)
+    const speed  = active ? 30 : 10
     const t      = 1 - Math.exp(-speed * delta)
 
     const targetY = active ? position[1] - PRESS_DEPTH : position[1]
@@ -139,9 +142,9 @@ export default function PianoKey({ noteId, isBlack, position }: PianoKeyProps) {
     >
       <meshStandardMaterial
         ref={matRef}
-        color={isBlack ? '#1a1a1a' : '#e8e8e8'}
-        roughness={isBlack ? 0.5 : 0.35}
-        metalness={isBlack ? 0.05 : 0.02}
+        color={isBlack ? '#121214' : '#fafafa'}
+        roughness={isBlack ? 0.55 : 0.15}
+        metalness={isBlack ? 0.05 : 0.0}
       />
 
       {hovered && (
