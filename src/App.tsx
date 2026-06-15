@@ -1,49 +1,47 @@
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import PianoKeyboard from './components/PianoKeyboard'
+import { useKeyboardInput } from './hooks/useKeyboardInput'
 
 export default function App() {
+  useKeyboardInput()
+
   return (
     <div className="app-shell">
-      {/* ── Header ── */}
       <header className="header">
         <div className="header-brand">
           <h1>Piano</h1>
-          <span className="tag">v0.1</span>
+          <span className="tag">v0.3</span>
         </div>
         <div className="header-info">
-          <span>C4 — B5</span>
-          <span className="octave-badge">2 Octaves</span>
+          <span>A0 — C8</span>
+          <span className="octave-badge">88 Keys</span>
         </div>
       </header>
 
-      {/* ── 3D Viewport ── */}
       <main className="viewport">
         <Canvas
-          camera={{ position: [0, 5, 7], fov: 50 }}
+          camera={{ position: [0, 14, 32], fov: 58 }}
           dpr={[1, 2]}
           gl={{ antialias: true, alpha: false }}
-          onCreated={({ gl }) => {
-            gl.setClearColor('#0e0e10')
-          }}
+          onCreated={({ gl }) => { gl.setClearColor('#0e0e10') }}
         >
           <ambientLight intensity={0.4} />
-          <directionalLight position={[5, 8, 5]} intensity={0.8} />
-          <directionalLight position={[-3, 6, -2]} intensity={0.3} />
+          <directionalLight position={[8, 12, 8]} intensity={0.8} />
+          <directionalLight position={[-6, 10, -4]} intensity={0.3} />
           <PianoKeyboard />
           <OrbitControls
             enablePan={false}
-            minPolarAngle={Math.PI / 6}
+            minPolarAngle={Math.PI / 8}
             maxPolarAngle={Math.PI / 2.5}
-            minDistance={5}
-            maxDistance={14}
+            minDistance={12}
+            maxDistance={50}
           />
         </Canvas>
       </main>
 
-      {/* ── Footer ── */}
       <footer className="footer">
-        <span>Phase 1 — Visual Layout</span>
+        <span>Keys A–; → C4–E5 · Mouse click any key · Scroll to zoom</span>
       </footer>
     </div>
   )
