@@ -24,6 +24,7 @@ dist-ssr
 *.sw?
 
 public/
+midi_files/
 lecture_1_build_systems.md
 lecture_2_3d_environments.md
 lecture_3_piano_geometry.md

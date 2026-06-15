@@ -1,17 +1,11 @@
-/**
- * Single 3D piano key with:
- *  - Pointer interaction (click, drag-to-play)
- *  - Imperative press/release animation via useFrame
- *  - Hover tooltip via @react-three/drei Html
- */
-
 import { useRef, useCallback, useState } from 'react'
 import * as THREE from 'three'
 import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
 import { pianoStore } from '../store/pianoStore'
+import { getKeyLabel } from '../constants/keyMap'
 
-/* ── Geometry constants ── */
+/* ── Geometry ── */
 const WHITE_W = 1.0, WHITE_H = 0.9, WHITE_D = 6.0
 const BLACK_W = 0.55, BLACK_H = 0.6, BLACK_D = 3.8
 const PRESS_DEPTH = 0.12
@@ -28,22 +22,38 @@ const EMISSIVE_ON = new THREE.Color('#444450')
 const EMISSIVE_OFF = new THREE.Color('#000000')
 
 /* ── Tooltip styles ── */
-const tooltipStyle: React.CSSProperties = {
-  background: 'rgba(24, 24, 27, 0.92)',
-  color: '#e4e4e7',
-  fontSize: '11px',
+const pillStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: '1px',
+  background: '#09090b',
+  border: '1px solid #27272a',
+  borderRadius: '6px',
+  padding: '5px 12px 4px',
+  pointerEvents: 'none',
+  userSelect: 'none',
+  whiteSpace: 'nowrap',
+  boxShadow: '0 4px 16px rgba(0,0,0,0.6)',
+}
+
+const noteStyle: React.CSSProperties = {
   fontFamily: "'Inter', sans-serif",
-  fontWeight: 500,
-  letterSpacing: '0.04em',
-  padding: '3px 10px',
-  borderRadius: '20px',
-  border: '1px solid rgba(63, 63, 70, 0.6)',
-  pointerEvents: 'none' as const,
-  userSelect: 'none' as const,
-  whiteSpace: 'nowrap' as const,
-  backdropFilter: 'blur(8px)',
-  WebkitBackdropFilter: 'blur(8px)',
-  boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
+  fontSize: '13px',
+  fontWeight: 600,
+  color: '#fafafa',
+  letterSpacing: '0.03em',
+  lineHeight: 1.2,
+}
+
+const keyStyle: React.CSSProperties = {
+  fontFamily: "'Inter', sans-serif",
+  fontSize: '9px',
+  fontWeight: 400,
+  color: '#71717a',
+  letterSpacing: '0.08em',
+  textTransform: 'uppercase',
+  lineHeight: 1.2,
 }
 
 interface PianoKeyProps {
@@ -58,7 +68,8 @@ export default function PianoKey({ noteId, isBlack, position }: PianoKeyProps) {
   const pointerHeld = useRef(false)
   const [hovered, setHovered] = useState(false)
 
-  /* ── Pointer handlers ── */
+  const keyLabel = getKeyLabel(noteId)
+
   const onPointerDown = useCallback((e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation()
     pointerHeld.current = true
@@ -88,7 +99,7 @@ export default function PianoKey({ noteId, isBlack, position }: PianoKeyProps) {
     }
   }, [noteId])
 
-  /* ── Per-frame animation ── */
+  /* ── Animation ── */
   const restColor  = isBlack ? BLACK_REST : WHITE_REST
   const pressColor = isBlack ? BLACK_PRESS : WHITE_PRESS
   const _c = useRef(new THREE.Color())
@@ -112,10 +123,7 @@ export default function PianoKey({ noteId, isBlack, position }: PianoKeyProps) {
     mat.emissive.lerp(_c.current, t)
   })
 
-  // Tooltip Y offset: above the key surface
-  const tooltipY = isBlack
-    ? BLACK_H + 0.6
-    : WHITE_H / 2 + 0.6
+  const tooltipY = isBlack ? BLACK_H + 0.6 : WHITE_H / 2 + 0.6
 
   return (
     <mesh
@@ -136,7 +144,6 @@ export default function PianoKey({ noteId, isBlack, position }: PianoKeyProps) {
         metalness={isBlack ? 0.05 : 0.02}
       />
 
-      {/* Hover tooltip */}
       {hovered && (
         <Html
           position={[0, tooltipY, 0]}
@@ -145,7 +152,10 @@ export default function PianoKey({ noteId, isBlack, position }: PianoKeyProps) {
           zIndexRange={[100, 0]}
           style={{ pointerEvents: 'none' }}
         >
-          <div style={tooltipStyle}>{noteId}</div>
+          <div style={pillStyle}>
+            <span style={noteStyle}>{noteId}</span>
+            {keyLabel && <span style={keyStyle}>key: {keyLabel}</span>}
+          </div>
         </Html>
       )}
     </mesh>

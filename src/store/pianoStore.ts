@@ -1,19 +1,20 @@
 /**
- * Minimal reactive store for active piano notes.
+ * Active-notes state store with source tracking.
  *
- * Tracks activation sources ('pointer' | 'keyboard') per note so that
- * simultaneous mouse + keyboard presses on the same key don't conflict.
- * Audio noteOn/noteOff fires only on aggregate state transitions.
+ * Sources: 'pointer' | 'keyboard' | 'midi'
+ *
+ * When skipAudio is true, the store only manages visual state — audio
+ * is handled externally (e.g., by MidiPlayer for precise scheduling).
  */
 
 import { synthEngine } from '../audio/SynthEngine'
 
-type Source = 'pointer' | 'keyboard'
+type Source = 'pointer' | 'keyboard' | 'midi'
 
 class PianoStore {
   private sources = new Map<string, Set<Source>>()
 
-  noteOn(noteId: string, source: Source): void {
+  noteOn(noteId: string, source: Source, skipAudio = false): void {
     const wasActive = this.isActive(noteId)
     let s = this.sources.get(noteId)
     if (!s) {
@@ -21,16 +22,16 @@ class PianoStore {
       this.sources.set(noteId, s)
     }
     s.add(source)
-    if (!wasActive) synthEngine.noteOn(noteId)
+    if (!wasActive && !skipAudio) synthEngine.noteOn(noteId)
   }
 
-  noteOff(noteId: string, source: Source): void {
+  noteOff(noteId: string, source: Source, skipAudio = false): void {
     const s = this.sources.get(noteId)
     if (!s) return
     s.delete(source)
     if (s.size === 0) {
       this.sources.delete(noteId)
-      synthEngine.noteOff(noteId)
+      if (!skipAudio) synthEngine.noteOff(noteId)
     }
   }
 

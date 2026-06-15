@@ -143,3 +143,78 @@ html, body, #root {
   pointer-events: none;
   z-index: 1;
 }
+
+/* ── MIDI Controls ── */
+.midi-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.midi-file-input {
+  display: none;
+}
+
+.midi-file-btn {
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: color 0.15s, border-color 0.15s;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.midi-file-btn:hover {
+  color: var(--text-primary);
+  border-color: #3f3f46;
+}
+
+.midi-meta {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.midi-transport {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.midi-btn {
+  font-family: var(--font);
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--border);
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  line-height: 1;
+}
+
+.midi-btn:hover:not(:disabled) {
+  color: var(--text-primary);
+  border-color: #3f3f46;
+  background: var(--surface-raised);
+}
+
+.midi-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
