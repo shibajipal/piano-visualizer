@@ -14,8 +14,11 @@ type Source = 'pointer' | 'keyboard' | 'midi'
 
 class PianoStore {
   private sources = new Map<string, Set<Source>>()
+  public pointerLocked = false
 
   noteOn(noteId: string, source: Source, skipAudio = false): void {
+    if (this.pointerLocked && source === 'pointer') return
+
     const wasActive = this.isActive(noteId)
     let s = this.sources.get(noteId)
     if (!s) {

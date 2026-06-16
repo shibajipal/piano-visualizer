@@ -1,6 +1,7 @@
 import { useRef, useMemo, useEffect, useState } from 'react'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
+import { Outlines } from '@react-three/drei'
 import { RoundedBoxGeometry } from 'three-stdlib'
 import * as Tone from 'tone'
 import { midiPlayer } from '../audio/MidiPlayer'
@@ -13,7 +14,7 @@ const PARTICLE_LIFETIME = 0.4 // seconds
 // Shared geometry for all blocks
 const blockGeo = new RoundedBoxGeometry(1, 1, 1, 4, 0.08)
 
-export default function WaterfallEngine() {
+export default function WaterfallEngine({ speed }: { speed: number }) {
   const groupRef = useRef<THREE.Group>(null!)
   const midiInstancedRef = useRef<THREE.InstancedMesh>(null!)
   
@@ -54,21 +55,20 @@ export default function WaterfallEngine() {
       const info = keyMap.get(note.note)
       if (!info) return
 
-      const length = Math.max(note.duration * waterfallStore.speed, 0.1)
-      const yCenter = note.time * waterfallStore.speed + length / 2
+      const length = Math.max(note.duration * speed, 0.1)
+      const yCenter = note.time * speed + length / 2
       
-      // Position directly behind/above the key
       dummy.position.set(info.x, yCenter, info.z - BLOCK_DEPTH / 2 - 0.5)
       dummy.scale.set(info.isBlack ? 0.55 : 0.9, length, BLOCK_DEPTH)
       dummy.updateMatrix()
       mesh.setMatrixAt(i, dummy.matrix)
-
-      color.set(info.isBlack ? '#3b82f6' : '#60a5fa') // Blue accent for MIDI notes
+      
+      color.set('#ffffff')
       mesh.setColorAt(i, color)
     })
     mesh.instanceMatrix.needsUpdate = true
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
-  }, [hasMidi, midiNotes, keyMap])
+  }, [hasMidi, midiNotes, keyMap, speed])
 
   // ── Animation Loop ──
   useFrame(() => {
@@ -99,17 +99,9 @@ export default function WaterfallEngine() {
             ref={midiInstancedRef}
             args={[blockGeo, undefined, midiNotes.length]}
             count={midiNotes.length}
-            castShadow
+            frustumCulled={false}
           >
-            <meshPhysicalMaterial
-              transparent
-              opacity={0.85}
-              roughness={0.15}
-              transmission={0.6}
-              thickness={1.5}
-              envMapIntensity={2.0}
-              toneMapped={false}
-            />
+            <meshBasicMaterial color="#111111" toneMapped={false} />
           </instancedMesh>
         </group>
       )}
@@ -131,18 +123,8 @@ export default function WaterfallEngine() {
             position={[info.x, yCenter + WHITE_KEY_HEIGHT/2, info.z - BLOCK_DEPTH / 2 - 0.5]}
             scale={[info.isBlack ? 0.55 : 0.9, length, BLOCK_DEPTH]}
             geometry={blockGeo}
-            castShadow
           >
-            <meshPhysicalMaterial
-              color={info.isBlack ? '#10b981' : '#34d399'}
-              transparent
-              opacity={0.85}
-              roughness={0.15}
-              transmission={0.6}
-              thickness={1.5}
-              envMapIntensity={2.0}
-              toneMapped={false}
-            />
+            <meshBasicMaterial color="#111111" toneMapped={false} />
           </mesh>
         )
       })}
@@ -166,9 +148,9 @@ export default function WaterfallEngine() {
           >
             <ringGeometry args={[0.3, 0.4, 32]} />
             <meshBasicMaterial
-              color="#ffffff"
+              color="#111111"
               transparent
-              opacity={opacity * 0.6}
+              opacity={opacity * 0.8}
               depthWrite={false}
               toneMapped={false}
             />

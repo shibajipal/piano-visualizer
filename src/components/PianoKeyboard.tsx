@@ -11,6 +11,7 @@
  */
 
 import { useMemo } from 'react'
+import { Edges } from '@react-three/drei'
 import PianoKey from './PianoKey'
 import { buildLayout, WHITE_KEY_HEIGHT, WHITE_KEY_DEPTH } from '../utils/keyboardLayout'
 
@@ -30,11 +31,6 @@ export default function PianoKeyboard() {
         <PianoKey key={k.noteId} noteId={k.noteId} isBlack={true} position={k.position} />
       ))}
 
-      {/* Base platform */}
-      <mesh position={[0, -WHITE_KEY_HEIGHT / 2 - 0.08, -0.2]} receiveShadow>
-        <boxGeometry args={[totalWidth + 2.5, 0.15, WHITE_KEY_DEPTH + 1.0]} />
-        <meshStandardMaterial color="#111113" roughness={0.8} metalness={0.1} />
-      </mesh>
     </group>
   )
 }

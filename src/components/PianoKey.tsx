@@ -1,8 +1,8 @@
 import { useRef, useCallback, useState } from 'react'
 import * as THREE from 'three'
 import { useFrame, type ThreeEvent } from '@react-three/fiber'
-import { Html } from '@react-three/drei'
-import { RoundedBoxGeometry } from 'three-stdlib'
+import { Html, Edges } from '@react-three/drei'
+import { Select } from '@react-three/postprocessing'
 import { pianoStore } from '../store/pianoStore'
 import { getKeyLabel } from '../constants/keyMap'
 
@@ -11,17 +11,15 @@ const WHITE_W = 1.0, WHITE_H = 0.9, WHITE_D = 6.0
 const BLACK_W = 0.55, BLACK_H = 0.6, BLACK_D = 3.8
 const PRESS_DEPTH = 0.15
 
-// Subtly beveled geometries for natural specular highlights
-const whiteGeo = new RoundedBoxGeometry(WHITE_W, WHITE_H, WHITE_D, 4, 0.05)
-const blackGeo = new RoundedBoxGeometry(BLACK_W, BLACK_H, BLACK_D, 4, 0.04)
+// Standard box geometries for crisp 90-degree ink edges
+const whiteGeo = new THREE.BoxGeometry(WHITE_W, WHITE_H, WHITE_D)
+const blackGeo = new THREE.BoxGeometry(BLACK_W, BLACK_H, BLACK_D)
 
 /* ── Color targets ── */
-const WHITE_REST  = new THREE.Color('#fafafa') // Porcelain finish
+const WHITE_REST  = new THREE.Color('#f4f0e6') // Paper background
 const WHITE_PRESS = new THREE.Color('#e4e4e7')
-const BLACK_REST  = new THREE.Color('#121214') // Matte ebony
-const BLACK_PRESS = new THREE.Color('#18181b')
-const EMISSIVE_ON = new THREE.Color('#444450')
-const EMISSIVE_OFF = new THREE.Color('#000000')
+const BLACK_REST  = new THREE.Color('#111111') // Ink
+const BLACK_PRESS = new THREE.Color('#333333')
 
 /* ── Tooltip styles ── */
 const pillStyle: React.CSSProperties = {
@@ -66,7 +64,7 @@ interface PianoKeyProps {
 
 export default function PianoKey({ noteId, isBlack, position }: PianoKeyProps) {
   const meshRef = useRef<THREE.Mesh>(null!)
-  const matRef  = useRef<THREE.MeshStandardMaterial>(null!)
+  const matRef  = useRef<THREE.MeshBasicMaterial>(null!)
   const pointerHeld = useRef(false)
   const [hovered, setHovered] = useState(false)
 
@@ -121,9 +119,6 @@ export default function PianoKey({ noteId, isBlack, position }: PianoKeyProps) {
 
     _c.current.copy(active ? pressColor : restColor)
     mat.color.lerp(_c.current, t)
-
-    _c.current.copy(active ? EMISSIVE_ON : EMISSIVE_OFF)
-    mat.emissive.lerp(_c.current, t)
   })
 
   const tooltipY = isBlack ? BLACK_H + 0.6 : WHITE_H / 2 + 0.6
@@ -137,15 +132,13 @@ export default function PianoKey({ noteId, isBlack, position }: PianoKeyProps) {
       onPointerUp={onPointerUp}
       onPointerEnter={onPointerEnter}
       onPointerLeave={onPointerLeave}
-      castShadow
-      receiveShadow={!isBlack}
     >
-      <meshStandardMaterial
+      <meshBasicMaterial
         ref={matRef}
-        color={isBlack ? '#121214' : '#fafafa'}
-        roughness={isBlack ? 0.55 : 0.15}
-        metalness={isBlack ? 0.05 : 0.0}
+        color={isBlack ? '#111111' : '#f4f0e6'}
+        toneMapped={false}
       />
+      <Edges color="#111111" threshold={15} />
 
       {hovered && (
         <Html

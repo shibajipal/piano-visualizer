@@ -24,5 +24,21 @@ for (const [key, noteId] of Object.entries(KEY_TO_NOTE)) {
 
 /** Returns the mapped keyboard key label for a noteId, or null if unmapped. */
 export function getKeyLabel(noteId: string): string | null {
-  return _reverse.get(noteId) ?? null
+  if (_reverse.has(noteId)) return _reverse.get(noteId)!
+
+  const match = noteId.match(/^([A-G]#?)(\d)$/)
+  if (!match) return null
+
+  const noteStr = match[1]
+  const octave = parseInt(match[2], 10)
+
+  // Check if reachable via Shift (base octave is 1 lower)
+  const shiftBase = `${noteStr}${octave - 1}`
+  if (_reverse.has(shiftBase)) return `SHIFT + ${_reverse.get(shiftBase)}`
+
+  // Check if reachable via Alt (base octave is 1 higher)
+  const altBase = `${noteStr}${octave + 1}`
+  if (_reverse.has(altBase)) return `ALT + ${_reverse.get(altBase)}`
+
+  return null
 }
