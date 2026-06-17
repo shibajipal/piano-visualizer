@@ -29,7 +29,15 @@ class SynthEngine {
   }
 
   private init(): void {
-    this.reverb = new Tone.Reverb({ decay: 2, wet: 0.25 })
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
+    if (isMobile) {
+      Tone.setContext(new Tone.Context({ latencyHint: 'playback' }))
+    }
+
+    if (!isMobile) {
+      this.reverb = new Tone.Reverb({ decay: 2, wet: 0.25 })
+    }
 
     this.sampler = new Tone.Sampler({
       urls: SAMPLE_URLS,
@@ -43,7 +51,16 @@ class SynthEngine {
         }
         this.pending = []
       },
-    }).chain(this.reverb, Tone.getDestination())
+    })
+
+    // @ts-ignore - Limit polyphony to prevent buffer underruns
+    this.sampler.maxPolyphony = isMobile ? 16 : 32;
+
+    if (this.reverb) {
+      this.sampler.chain(this.reverb, Tone.getDestination())
+    } else {
+      this.sampler.connect(Tone.getDestination())
+    }
   }
 
   /** Trigger note attack. Optional `time` for Transport-scheduled precision. */
