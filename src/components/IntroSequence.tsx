@@ -24,7 +24,7 @@ export default function IntroSequence({ onComplete }: { onComplete: () => void }
     for (let i = START_FRAME; i <= END_FRAME; i++) {
       const img = new Image()
       const padded = i.toString().padStart(3, '0')
-      img.src = `/intro final/${padded}.png`
+      img.src = `/intro-final/${padded}.png`
       img.onload = () => {
         loaded++
         setLoadedCount(loaded)
