@@ -2,7 +2,6 @@ import { useRef, useCallback, useState } from 'react'
 import * as THREE from 'three'
 import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { Html, Edges } from '@react-three/drei'
-import { Select } from '@react-three/postprocessing'
 import { pianoStore } from '../store/pianoStore'
 import { getKeyLabel } from '../constants/keyMap'
 

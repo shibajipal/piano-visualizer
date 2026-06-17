@@ -11,12 +11,11 @@
  */
 
 import { useMemo } from 'react'
-import { Edges } from '@react-three/drei'
 import PianoKey from './PianoKey'
-import { buildLayout, WHITE_KEY_HEIGHT, WHITE_KEY_DEPTH } from '../utils/keyboardLayout'
+import { buildLayout } from '../utils/keyboardLayout'
 
 export default function PianoKeyboard() {
-  const { keys, totalWidth } = useMemo(() => buildLayout(), [])
+  const { keys } = useMemo(() => buildLayout(), [])
 
   // Render whites first so blacks are on top for raycasting priority
   const whites = keys.filter(k => !k.isBlack)
