@@ -18,6 +18,11 @@ const PRESET_MIDIS = [
   { name: 'Imagine Dragons - Radioactive', path: '/midi/Imagine dragons - Radioactive.mid' },
   { name: 'Never Gonna Give You Up', path: '/midi/Never-Gonna-Give-You-Up-3.mid' },
   { name: 'Pokemon Center Theme', path: '/midi/Pokemon - Pokemon Center Theme.mid' },
+  { name: 'Kanye West - Runaway (Westworld)', path: '/midi/Runaway - Kanye West (Westworld).mid.mid' },
+  { name: 'Boney M - Rasputin', path: '/midi/BONEY M.Rasputin K.mid' },
+  { name: 'Jingle Bells', path: '/midi/Jingle-Bells.mid' },
+  { name: 'My Heart Will Go On (Titanic)', path: "/midi/My-Heart-Will-Go-On-(From-'Titanic').mid" },
+  { name: 'Queen - Bohemian Rhapsody', path: '/midi/Queen - Bohemian Rhapsody.mid' },
 ]
 
 export default function App() {
