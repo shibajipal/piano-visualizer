@@ -149,6 +149,12 @@ class MidiPlayer {
     this._paused = false
   }
 
+  clear(): void {
+    this.stop()
+    this.notes = []
+    this._info = null
+  }
+
   private clearSchedule(): void {
     const transport = Tone.getTransport()
     for (const id of this.eventIds) {

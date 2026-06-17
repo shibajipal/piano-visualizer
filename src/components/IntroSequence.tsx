@@ -1,27 +1,35 @@
 import { useEffect, useRef, useState } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-const FRAME_COUNT = 50
+gsap.registerPlugin(ScrollTrigger)
+
+const START_FRAME = 1
+const END_FRAME = 100
+const FRAME_COUNT = END_FRAME - START_FRAME + 1
 
 export default function IntroSequence({ onComplete }: { onComplete: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const [loaded, setLoaded] = useState(0)
+  const spacerRef = useRef<HTMLDivElement>(null)
+  const [loadedCount, setLoadedCount] = useState(0)
   const imagesRef = useRef<HTMLImageElement[]>([])
   
   // Preload images
   useEffect(() => {
-    let loadedCount = 0
+    let loaded = 0
     const images: HTMLImageElement[] = []
     
-    for (let i = 1; i <= FRAME_COUNT; i++) {
+    for (let i = START_FRAME; i <= END_FRAME; i++) {
       const img = new Image()
-      const padded = i.toString().padStart(2, '0')
-      img.src = `/intro/${padded}.png`
+      const padded = i.toString().padStart(3, '0')
+      img.src = `/intro final/${padded}.png`
       img.onload = () => {
-        loadedCount++
-        setLoaded(loadedCount)
-        if (loadedCount === FRAME_COUNT && canvasRef.current) {
-          drawFrame(1)
+        loaded++
+        setLoadedCount(loaded)
+        if (loaded === FRAME_COUNT && canvasRef.current) {
+          // Draw the very first valid frame immediately
+          drawFrame(0)
         }
       }
       images.push(img)
@@ -29,88 +37,76 @@ export default function IntroSequence({ onComplete }: { onComplete: () => void }
     imagesRef.current = images
   }, [])
 
-  const drawFrame = (frame: number) => {
+  const drawFrame = (index: number) => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
-    const img = imagesRef.current[frame - 1]
+    const img = imagesRef.current[index]
     if (!img || !img.complete) return
     
-    // Fit to canvas
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
-    
-    // Cover calculation (object-fit: cover equivalent for canvas)
-    const hRatio = canvas.width / img.width
-    const vRatio = canvas.height / img.height
-    const ratio  = Math.max(hRatio, vRatio)
-    const centerShift_x = (canvas.width - img.width*ratio) / 2
-    const centerShift_y = (canvas.height - img.height*ratio) / 2  
+    canvas.width = img.width
+    canvas.height = img.height
     
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    ctx.drawImage(img, 0, 0, img.width, img.height,
-                       centerShift_x, centerShift_y, img.width*ratio, img.height*ratio)
+    ctx.drawImage(img, 0, 0)
   }
 
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.currentTarget
-    const scrollTop = target.scrollTop
-    const maxScroll = target.scrollHeight - target.clientHeight
-    
-    if (maxScroll <= 0) return
-    
-    const scrollFraction = scrollTop / maxScroll
-    
-    const frameIndex = Math.min(
-      FRAME_COUNT,
-      Math.max(1, Math.ceil(scrollFraction * FRAME_COUNT))
-    )
-    
-    requestAnimationFrame(() => drawFrame(frameIndex))
-    
-    // If we reach the very bottom, complete the sequence
-    if (scrollFraction >= 0.99) {
-      // Add a tiny delay to let the user see the final frame
-      setTimeout(() => {
-        onComplete()
-      }, 400)
-    }
-  }
-
-  // Handle window resize
+  // Setup GSAP ScrollTrigger
   useEffect(() => {
-    const handleResize = () => {
-      // Redraw current frame on resize
-      if (containerRef.current) {
-        const scrollTop = containerRef.current.scrollTop
-        const maxScroll = containerRef.current.scrollHeight - containerRef.current.clientHeight
-        const fraction = maxScroll > 0 ? scrollTop / maxScroll : 0
-        const frameIndex = Math.max(1, Math.min(FRAME_COUNT, Math.ceil(fraction * FRAME_COUNT)))
-        drawFrame(frameIndex)
+    if (loadedCount < FRAME_COUNT || !containerRef.current || !spacerRef.current) return
+
+    const animationObj = { frame: 0 }
+
+    const tween = gsap.to(animationObj, {
+      frame: FRAME_COUNT - 1,
+      snap: 'frame',
+      ease: 'none',
+      scrollTrigger: {
+        scroller: containerRef.current,
+        trigger: spacerRef.current,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.5,
+        onUpdate: (self) => {
+          if (self.progress >= 0.99) {
+            setTimeout(() => {
+              onComplete()
+            }, 400)
+          }
+        }
+      },
+      onUpdate: () => {
+        drawFrame(animationObj.frame)
       }
+    })
+
+    return () => {
+      if (tween.scrollTrigger) tween.scrollTrigger.kill()
+      tween.kill()
     }
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  }, [loadedCount, onComplete])
 
   return (
     <div 
       ref={containerRef}
       className="intro-scroll-container" 
-      onScroll={handleScroll}
     >
-      <div className="intro-spacer" style={{ height: '500vh' }}>
+      <div className="intro-spacer" ref={spacerRef} style={{ height: '300vh' }}>
         <div className="intro-sticky">
-          <canvas ref={canvasRef} className="intro-canvas" />
+          <canvas 
+            ref={canvasRef} 
+            className="intro-canvas" 
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
           
-          {loaded < FRAME_COUNT && (
+          {loadedCount < FRAME_COUNT && (
             <div className="intro-loading">
-              Loading sequence... {Math.round((loaded/FRAME_COUNT)*100)}%
+              Loading sequence... {Math.round((loadedCount / FRAME_COUNT) * 100)}%
             </div>
           )}
           
-          {loaded === FRAME_COUNT && (
+          {loadedCount === FRAME_COUNT && (
             <div className="intro-prompt">
               <span className="mouse-icon"></span>
               Scroll to unveil
@@ -121,3 +117,4 @@ export default function IntroSequence({ onComplete }: { onComplete: () => void }
     </div>
   )
 }
+

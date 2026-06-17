@@ -68,6 +68,11 @@ class WaterfallStore {
     this.effectsEnabled = enabled
   }
 
+  clearAll(): void {
+    this.manualNotes = []
+    this.particles = []
+  }
+
   /**
    * Garbage collection called periodically from the rendering loop.
    */

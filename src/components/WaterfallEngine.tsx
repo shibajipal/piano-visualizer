@@ -1,8 +1,6 @@
 import { useRef, useMemo, useEffect, useState } from 'react'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
-import { Outlines } from '@react-three/drei'
-import { RoundedBoxGeometry } from 'three-stdlib'
 import * as Tone from 'tone'
 import { midiPlayer } from '../audio/MidiPlayer'
 import { waterfallStore, type ManualNote, type ImpactParticle } from '../store/waterfallStore'
@@ -11,12 +9,26 @@ import { buildLayout, WHITE_KEY_HEIGHT, WHITE_KEY_DEPTH, BLACK_KEY_DEPTH } from 
 const BLOCK_DEPTH = 0.8 // Z-thickness of falling blocks
 const PARTICLE_LIFETIME = 0.4 // seconds
 
-// Shared geometry for all blocks
-const blockGeo = new RoundedBoxGeometry(1, 1, 1, 4, 0.08)
+// Shared geometry & materials for all blocks
+const blockGeo = new THREE.BoxGeometry(1, 1, 1)
+const edgesGeo = new THREE.EdgesGeometry(blockGeo, 15)
+
+// The solid black material gets pushed slightly back into the depth buffer so the white lines render cleanly on top
+const solidMat = new THREE.MeshBasicMaterial({ 
+  color: '#111111', 
+  toneMapped: false,
+  polygonOffset: true,
+  polygonOffsetFactor: 1,
+  polygonOffsetUnits: 1
+})
+
+const edgeMat = new THREE.LineBasicMaterial({ 
+  color: '#333333', 
+  toneMapped: false 
+})
 
 export default function WaterfallEngine({ speed }: { speed: number }) {
   const groupRef = useRef<THREE.Group>(null!)
-  const midiInstancedRef = useRef<THREE.InstancedMesh>(null!)
   
   // Track active state to trigger re-renders when manual notes / particles change
   // We use a fast polling ref approach for position updates to avoid React overhead,
@@ -46,28 +58,34 @@ export default function WaterfallEngine({ speed }: { speed: number }) {
   const hasMidi = midiPlayer.loaded && midiNotes && midiNotes.length > 0
 
   useEffect(() => {
-    if (!hasMidi || !midiInstancedRef.current) return
-    const mesh = midiInstancedRef.current
-    const dummy = new THREE.Object3D()
-    const color = new THREE.Color()
+    if (!hasMidi || !groupRef.current) return
+    const group = groupRef.current
 
-    midiNotes.forEach((note, i) => {
+    midiNotes.forEach((note) => {
       const info = keyMap.get(note.note)
       if (!info) return
 
       const length = Math.max(note.duration * speed, 0.1)
       const yCenter = note.time * speed + length / 2
+      const baseWidth = info.isBlack ? 0.51 : 0.93
       
-      dummy.position.set(info.x, yCenter, info.z - BLOCK_DEPTH / 2 - 0.5)
-      dummy.scale.set(info.isBlack ? 0.55 : 0.9, length, BLOCK_DEPTH)
-      dummy.updateMatrix()
-      mesh.setMatrixAt(i, dummy.matrix)
+      const mesh = new THREE.Mesh(blockGeo, solidMat)
+      mesh.position.set(info.x, yCenter, info.z - BLOCK_DEPTH / 2 - 0.5)
+      mesh.scale.set(baseWidth, length, BLOCK_DEPTH)
       
-      color.set('#ffffff')
-      mesh.setColorAt(i, color)
+      // Attach authentic edge lines
+      const edges = new THREE.LineSegments(edgesGeo, edgeMat)
+      mesh.add(edges)
+      
+      group.add(mesh)
     })
-    mesh.instanceMatrix.needsUpdate = true
-    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
+
+    return () => {
+      // Cleanup native meshes
+      while (group.children.length > 0) {
+        group.remove(group.children[0])
+      }
+    }
   }, [hasMidi, midiNotes, keyMap, speed])
 
   // ── Animation Loop ──
@@ -93,18 +111,7 @@ export default function WaterfallEngine({ speed }: { speed: number }) {
   return (
     <group>
       {/* MIDI Waterfall */}
-      {hasMidi && (
-        <group ref={groupRef}>
-          <instancedMesh
-            ref={midiInstancedRef}
-            args={[blockGeo, undefined, midiNotes.length]}
-            count={midiNotes.length}
-            frustumCulled={false}
-          >
-            <meshBasicMaterial color="#111111" toneMapped={false} />
-          </instancedMesh>
-        </group>
-      )}
+      <group ref={groupRef} />
 
       {/* Manual Waterfall */}
       {manualNotes.map(note => {
@@ -117,14 +124,17 @@ export default function WaterfallEngine({ speed }: { speed: number }) {
         const length = Math.max(topY - bottomY, 0.1)
         const yCenter = (topY + bottomY) / 2
 
+        const baseWidth = info.isBlack ? 0.51 : 0.93
+
         return (
           <mesh
             key={note.id}
             position={[info.x, yCenter + WHITE_KEY_HEIGHT/2, info.z - BLOCK_DEPTH / 2 - 0.5]}
-            scale={[info.isBlack ? 0.55 : 0.9, length, BLOCK_DEPTH]}
+            scale={[baseWidth, length, BLOCK_DEPTH]}
             geometry={blockGeo}
+            material={solidMat}
           >
-            <meshBasicMaterial color="#111111" toneMapped={false} />
+            <lineSegments geometry={edgesGeo} material={edgeMat} />
           </mesh>
         )
       })}

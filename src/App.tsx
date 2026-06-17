@@ -109,7 +109,8 @@ export default function App() {
   }, [])
 
   const handleClearMidi = useCallback(() => {
-    midiPlayer.stop()
+    midiPlayer.clear()
+    waterfallStore.clearAll()
     setMidiInfo(null)
     setIsPlaying(false)
     setIsPaused(false)
