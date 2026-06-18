@@ -7,24 +7,33 @@ const whiteMat = new THREE.MeshBasicMaterial({ color: '#f4f0e6', toneMapped: fal
 const blackMat = new THREE.MeshBasicMaterial({ color: '#111111', toneMapped: false })
 const edgeColor = "#111111"
 
+// Helper function to generate the grand piano curve with adjustable dimensions
+function createPianoShape(width: number, depth: number) {
+  const shape = new THREE.Shape()
+  
+  // Start at bottom left (player's left)
+  shape.moveTo(-width / 2 - 1, 2)
+  // Go up to the back left corner
+  shape.lineTo(-width / 2 - 1, -10)
+  // Curve to the back point
+  shape.bezierCurveTo(-width / 2, -depth, width / 4, -depth, width / 2 - 2, -15)
+  // Curve to the front right
+  shape.bezierCurveTo(width / 2, -10, width / 2 + 1, -5, width / 2 + 1, 2)
+  // Close the shape (front edge)
+  shape.lineTo(-width / 2 - 1, 2)
+  
+  return shape
+}
+
 export default function GrandPianoBody() {
   // Create a curved shape for the grand piano rim
   const rimShape = useMemo(() => {
-    const shape = new THREE.Shape()
-    const width = 56 // Wraps the 54-unit 88-key layout
-    const depth = 45 // How deep the grand piano goes
-    
-    // Start at bottom left (player's left)
-    shape.moveTo(-width / 2 - 1, 2)
-    // Go up to the back left corner
-    shape.lineTo(-width / 2 - 1, -10)
-    // Curve to the back point
-    shape.bezierCurveTo(-width / 2, -depth, width / 4, -depth, width / 2 - 2, -15)
-    // Curve to the front right
-    shape.bezierCurveTo(width / 2, -10, width / 2 + 1, -5, width / 2 + 1, 2)
-    // Close the shape (front edge)
-    shape.lineTo(-width / 2 - 1, 2)
-    return shape
+    return createPianoShape(56, 45) // width: 56, depth: 45
+  }, [])
+
+  // Lid shape — tweak width/depth independently from body
+  const lidShape = useMemo(() => {
+    return createPianoShape(56, 45) // <-- Configure lid width & depth here
   }, [])
 
   const extrudeSettings = {
@@ -32,17 +41,36 @@ export default function GrandPianoBody() {
     bevelEnabled: false
   }
 
+  const lidAngle = Math.PI * 0.15
+
+  const hingeX = -29
+  const hingeY = 4
+  const hingeZ = 1.5  // same Z as body mesh position
+
+  const propBaseX = 24.4
+  const propBaseY = -5.5 // on top of rim
+  const propBaseZ = -15   // toward the back
+
+
+  const propDistFromHinge = propBaseX - hingeX  // = 44
+  const propTopY = hingeY + propDistFromHinge * Math.sin(lidAngle)
+  const propTopX = hingeX + propDistFromHinge * Math.cos(lidAngle)
+
+  const propStickLength = 26.5
+  const propCenterY = (propBaseY + propTopY) / 2
+  const propCenterX = (propBaseX + propTopX) / 2
+
   return (
     <group position={[0, -0.5, 0]}>
       {/* Main Body (Rim and soundboard area) */}
-      <mesh position={[0, 0, 1.5]} rotation={[Math.PI / 2, 0, 0]}>
+      <mesh position={[0, 0, -8]} rotation={[Math.PI / 2, 0, 0]}>
         <extrudeGeometry args={[rimShape, extrudeSettings]} />
         <primitive object={whiteMat} attach="material" />
         <Edges color={edgeColor} threshold={15} />
       </mesh>
 
       {/* Left Cheek Block */}
-      <mesh position={[-27.5, 1, 0]}>
+      <mesh position={[-28.6, 1, 0]}>
         <boxGeometry args={[2, 2, 7]} />
         <primitive object={whiteMat} attach="material" />
         <Edges color={edgeColor} threshold={15} />
@@ -51,6 +79,13 @@ export default function GrandPianoBody() {
       {/* Right Cheek Block */}
       <mesh position={[27.5, 1, 0]}>
         <boxGeometry args={[2, 2, 7]} />
+        <primitive object={whiteMat} attach="material" />
+        <Edges color={edgeColor} threshold={15} />
+      </mesh>
+
+      {/* Keybed  */}
+      <mesh position={[0, -2, -1]}>
+        <boxGeometry args={[58, 4, 10]} />
         <primitive object={whiteMat} attach="material" />
         <Edges color={edgeColor} threshold={15} />
       </mesh>
@@ -77,12 +112,12 @@ export default function GrandPianoBody() {
       </mesh>
 
       {/* Legs (with subtle taper by using cylinder or just nice boxes) */}
-      <mesh position={[-26.5, -11, 0]}>
+      <mesh position={[-24.5, -11, -5]}>
         <boxGeometry args={[2, 14, 2]} />
         <primitive object={whiteMat} attach="material" />
         <Edges color={edgeColor} threshold={15} />
       </mesh>
-      <mesh position={[26.5, -11, 0]}>
+      <mesh position={[24.5, -11, -5]}>
         <boxGeometry args={[2, 14, 2]} />
         <primitive object={whiteMat} attach="material" />
         <Edges color={edgeColor} threshold={15} />
@@ -94,36 +129,36 @@ export default function GrandPianoBody() {
       </mesh>
       
       {/* Lyre Box (Pedals holder) */}
-      <group position={[0, -7, -3]}>
+      <group position={[0, -9, -5]}>
         {/* Main pillars */}
         <mesh position={[-1.5, 0, 0]}>
-          <boxGeometry args={[0.8, 10, 0.8]} />
+          <boxGeometry args={[0.8, 15, 0.8]} />
           <primitive object={whiteMat} attach="material" />
           <Edges color={edgeColor} threshold={15} />
         </mesh>
         <mesh position={[1.5, 0, 0]}>
-          <boxGeometry args={[0.8, 10, 0.8]} />
+          <boxGeometry args={[0.8, 15, 0.8]} />
           <primitive object={whiteMat} attach="material" />
           <Edges color={edgeColor} threshold={15} />
         </mesh>
         {/* Pedal Box */}
-        <mesh position={[0, -4.5, 0.5]}>
+        <mesh position={[0, -7, 0.5]}>
           <boxGeometry args={[5, 1.5, 2]} />
           <primitive object={whiteMat} attach="material" />
           <Edges color={edgeColor} threshold={15} />
         </mesh>
         {/* Pedals (Brass/Dark) */}
-        <mesh position={[-1.2, -4.5, 1.8]}>
+        <mesh position={[-1.2, -7, 1.8]}>
           <boxGeometry args={[0.4, 0.2, 1.5]} />
           <primitive object={blackMat} attach="material" />
           <Edges color={edgeColor} threshold={15} />
         </mesh>
-        <mesh position={[0, -4.5, 1.8]}>
+        <mesh position={[0, -7, 1.8]}>
           <boxGeometry args={[0.4, 0.2, 1.5]} />
           <primitive object={blackMat} attach="material" />
           <Edges color={edgeColor} threshold={15} />
         </mesh>
-        <mesh position={[1.2, -4.5, 1.8]}>
+        <mesh position={[1.2, -7, 1.8]}>
           <boxGeometry args={[0.4, 0.2, 1.5]} />
           <primitive object={blackMat} attach="material" />
           <Edges color={edgeColor} threshold={15} />
@@ -156,9 +191,23 @@ export default function GrandPianoBody() {
         </mesh>
       </group>
 
-      {/* Folded back flat lid (exposing the interior) */}
-      <mesh position={[0, 3.6, -16]} rotation={[Math.PI / 2, 0, 0]}>
-        <extrudeGeometry args={[rimShape, { depth: 0.5, bevelEnabled: false }]} />
+      {/* Lid */}
+      <group position={[hingeX, hingeY, hingeZ]}>
+        <group rotation={[0, 0, lidAngle]}>
+          <mesh position={[27, -3, -9.5]} rotation={[Math.PI / 2, 0, 0]}>
+            <extrudeGeometry args={[lidShape, { depth: 0.5, bevelEnabled: false }]} />
+            <primitive object={whiteMat} attach="material" />
+            <Edges color={edgeColor} threshold={15} />
+          </mesh>
+        </group>
+      </group>
+
+      {/* Stick */}
+      <mesh
+        position={[propCenterX, propCenterY, propBaseZ]}
+        rotation={[0, 0, -100]}
+      >
+        <boxGeometry args={[0.3, propStickLength, 0.3]} />
         <primitive object={whiteMat} attach="material" />
         <Edges color={edgeColor} threshold={15} />
       </mesh>
