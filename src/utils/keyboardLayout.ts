@@ -1,4 +1,4 @@
-/* ── Layout constants ── */
+/* Layout constants */
 export const WHITE_KEY_WIDTH  = 1.0
 export const WHITE_KEY_GAP    = 0.06
 export const WHITE_KEY_DEPTH  = 6.0
@@ -7,7 +7,7 @@ export const BLACK_KEY_HEIGHT = 0.6
 export const BLACK_KEY_DEPTH  = 3.8
 export const WHITE_KEY_PITCH  = WHITE_KEY_WIDTH + WHITE_KEY_GAP
 
-/* ── Note helpers ── */
+/* Note helpers */
 const BLACK_SEMITONES = new Set([1, 3, 6, 8, 10])
 
 const SEMI_NAME: Record<number, string> = {
@@ -39,7 +39,7 @@ export interface KeyLayout {
 export function buildLayout(): { keys: KeyLayout[]; totalWidth: number } {
   const keys: KeyLayout[] = []
 
-  // ── Pass 1: index all white key X positions by MIDI number ──
+  // Pass 1: index all white key X positions by MIDI number
   const whiteX = new Map<number, number>()
   let wIdx = 0
   for (let midi = 21; midi <= 108; midi++) {
@@ -52,7 +52,7 @@ export function buildLayout(): { keys: KeyLayout[]; totalWidth: number } {
   const totalWidth = (totalWhite - 1) * WHITE_KEY_PITCH
   const offsetX = -totalWidth / 2
 
-  // ── Pass 2: generate key definitions ──
+  // Pass 2: generate key definitions
   for (let midi = 21; midi <= 108; midi++) {
     const semi = midi % 12
     const octave = Math.floor(midi / 12) - 1

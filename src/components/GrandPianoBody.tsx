@@ -35,7 +35,7 @@ export default function GrandPianoBody() {
   return (
     <group position={[0, -0.5, 0]}>
       {/* Main Body (Rim and soundboard area) */}
-      <mesh position={[0, -0.5, -3]} rotation={[Math.PI / 2, 0, 0]}>
+      <mesh position={[0, 0, 1.5]} rotation={[Math.PI / 2, 0, 0]}>
         <extrudeGeometry args={[rimShape, extrudeSettings]} />
         <primitive object={whiteMat} attach="material" />
         <Edges color={edgeColor} threshold={15} />
@@ -77,17 +77,17 @@ export default function GrandPianoBody() {
       </mesh>
 
       {/* Legs (with subtle taper by using cylinder or just nice boxes) */}
-      <mesh position={[-26.5, -8.5, 0]}>
+      <mesh position={[-26.5, -11, 0]}>
         <boxGeometry args={[2, 14, 2]} />
         <primitive object={whiteMat} attach="material" />
         <Edges color={edgeColor} threshold={15} />
       </mesh>
-      <mesh position={[26.5, -8.5, 0]}>
+      <mesh position={[26.5, -11, 0]}>
         <boxGeometry args={[2, 14, 2]} />
         <primitive object={whiteMat} attach="material" />
         <Edges color={edgeColor} threshold={15} />
       </mesh>
-      <mesh position={[8, -8.5, -38]}>
+      <mesh position={[8, -11, -28]}>
         <boxGeometry args={[2, 14, 2]} />
         <primitive object={whiteMat} attach="material" />
         <Edges color={edgeColor} threshold={15} />
@@ -133,18 +133,18 @@ export default function GrandPianoBody() {
       {/* Internal Details (Strings & Iron Plate Struts) */}
       <group position={[0, -2, -15]}>
         {/* Soundboard grid/strings layer */}
-        <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0.2]}>
+        {/* <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0.2]}>
           <planeGeometry args={[40, 30, 20, 15]} />
-          <meshBasicMaterial color="#f4f0e6" wireframe={true} toneMapped={false} />
-        </mesh>
+          <meshBasicMaterial color="#111111" wireframe={true} toneMapped={false} />
+        </mesh> */}
         
         {/* Iron Struts (Thick structural bars) */}
-        <mesh position={[-10, 0.5, -5]} rotation={[0, 0.3, 0]}>
+        <mesh position={[-10, 0.5, -0.5]} rotation={[0, 0.3, 0]}>
           <boxGeometry args={[2, 1.5, 30]} />
           <primitive object={whiteMat} attach="material" />
           <Edges color={edgeColor} threshold={15} />
         </mesh>
-        <mesh position={[10, 0.5, -2]} rotation={[0, -0.4, 0]}>
+        <mesh position={[10, 0.5, 2.5]} rotation={[0, -0.4, 0]}>
           <boxGeometry args={[2, 1.5, 25]} />
           <primitive object={whiteMat} attach="material" />
           <Edges color={edgeColor} threshold={15} />

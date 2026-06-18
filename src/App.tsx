@@ -174,7 +174,7 @@ export default function App() {
           <span className="tag">v1.0</span>
         </div>
 
-        {/* ── Dashboard Controls ── */}
+        {/* Dashboard Controls */}
         <div className="header-center-stack">
           <div className="midi-controls">
             {midiInfo ? (
@@ -335,8 +335,8 @@ export default function App() {
           <OrbitControls
             enablePan={false}
             enableRotate={manualSpin}
-            minPolarAngle={Math.PI / 8}
-            maxPolarAngle={Math.PI / 2.5}
+            minPolarAngle={0}
+            maxPolarAngle={Math.PI}
             minDistance={12}
             maxDistance={120}
             autoRotate={autoRotate}

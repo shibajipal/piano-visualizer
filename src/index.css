@@ -1,4 +1,4 @@
-/* ── Reset & Global Tokens ── */
+/* Reset & Global Tokens */
 *,
 *::before,
 *::after {
@@ -35,7 +35,7 @@ body,
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── Layout Shell ── */
+/* Layout Shell */
 .app-shell {
   display: flex;
   flex-direction: column;
@@ -119,7 +119,7 @@ body,
   opacity: 0.7;
 }
 
-/* ── Canvas Viewport ── */
+/* Canvas Viewport */
 .viewport {
   flex: 1;
   position: relative;
@@ -132,7 +132,7 @@ body,
   height: 100% !important;
 }
 
-/* ── Footer Bar ── */
+/* Footer Bar */
 .footer {
   display: flex;
   align-items: center;
@@ -150,7 +150,7 @@ body,
   letter-spacing: 0.02em;
 }
 
-/* ── Full screen noise overlay for WebGL ── */
+/* Full screen noise overlay for WebGL */
 .viewport::before {
   content: '';
   position: absolute;
@@ -163,7 +163,7 @@ body,
   z-index: 5;
 }
 
-/* ── Subtle ambient glow on canvas ── */
+/* Subtle ambient glow on canvas */
 .viewport::after {
   content: '';
   position: absolute;
@@ -177,7 +177,7 @@ body,
   z-index: 1;
 }
 
-/* ── Header Center Stack ── */
+/* Header Center Stack */
 .header-center-stack {
   display: flex;
   flex-direction: column;
@@ -185,7 +185,7 @@ body,
   gap: 8px;
 }
 
-/* ── MIDI Controls ── */
+/* MIDI Controls */
 .midi-controls {
   display: flex;
   align-items: center;
@@ -312,7 +312,7 @@ body,
   cursor: default;
 }
 
-/* ── FX Controls ── */
+/* FX Controls */
 .fx-controls {
   display: flex;
   align-items: center;
@@ -374,7 +374,7 @@ body,
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* ── Intro Sequence ── */
+/* Intro Sequence */
 .intro-scroll-container {
   width: 100vw;
   height: 100vh;
@@ -477,7 +477,7 @@ body,
   }
 }
 
-/* ── Help Modal ── */
+/* Help Modal */
 .help-btn {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -580,7 +580,7 @@ body,
   color: var(--bg);
 }
 
-/* ── Mobile Overrides ── */
+/* Mobile Overrides */
 .mobile-only {
   display: none;
 }

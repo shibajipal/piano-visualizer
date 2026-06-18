@@ -5,7 +5,7 @@ import { Html, Edges } from '@react-three/drei'
 import { pianoStore } from '../store/pianoStore'
 import { getKeyLabel } from '../constants/keyMap'
 
-/* ── Geometry ── */
+/* Geometry */
 const WHITE_W = 1.0, WHITE_H = 0.9, WHITE_D = 6.0
 const BLACK_W = 0.55, BLACK_H = 0.6, BLACK_D = 3.8
 const PRESS_DEPTH = 0.15
@@ -14,13 +14,13 @@ const PRESS_DEPTH = 0.15
 const whiteGeo = new THREE.BoxGeometry(WHITE_W, WHITE_H, WHITE_D)
 const blackGeo = new THREE.BoxGeometry(BLACK_W, BLACK_H, BLACK_D)
 
-/* ── Color targets ── */
+/* Color targets */
 const WHITE_REST  = new THREE.Color('#f4f0e6') // Paper background
 const WHITE_PRESS = new THREE.Color('#e4e4e7')
 const BLACK_REST  = new THREE.Color('#111111') // Ink
 const BLACK_PRESS = new THREE.Color('#333333')
 
-/* ── Tooltip styles ── */
+/* Tooltip styles */
 const pillStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
@@ -98,7 +98,7 @@ export default function PianoKey({ noteId, isBlack, position }: PianoKeyProps) {
     }
   }, [noteId])
 
-  /* ── Animation ── */
+  /* Animation */
   const restColor  = isBlack ? BLACK_REST : WHITE_REST
   const pressColor = isBlack ? BLACK_PRESS : WHITE_PRESS
   const _c = useRef(new THREE.Color())

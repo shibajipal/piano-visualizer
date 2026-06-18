@@ -51,7 +51,7 @@ export default function WaterfallEngine({ speed }: { speed: number }) {
     return map
   }, [keys])
 
-  // ── MIDI InstancedMesh Setup ──
+  // MIDI InstancedMesh Setup
   // We build this once when a MIDI file is loaded.
   // The entire mesh just translates down on the Y axis during playback!
   const midiNotes = (midiPlayer as any).notes as {time: number, duration: number, note: string}[]
@@ -88,7 +88,7 @@ export default function WaterfallEngine({ speed }: { speed: number }) {
     }
   }, [hasMidi, midiNotes, keyMap, speed])
 
-  // ── Animation Loop ──
+  // Animation Loop
   useFrame(() => {
     const now = Tone.now()
     waterfallStore.cleanup(now)
@@ -103,7 +103,7 @@ export default function WaterfallEngine({ speed }: { speed: number }) {
     }
   })
 
-  // ── Render ──
+  // Render
   if (!waterfallStore.effectsEnabled) return null
 
   const now = Tone.now()
