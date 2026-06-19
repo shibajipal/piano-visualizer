@@ -13,13 +13,13 @@ export const KEY_TO_NOTE: Record<string, string> = {
   'j': 'B4',
   'k': 'C5',   'o': 'C#5',
   'l': 'D5',   'p': 'D#5',
-  ';': 'E5',
+  'm': 'E5',
 }
 
-// Reverse: noteId → display label for keyboard key
+// Reverse: noteId -> display label for keyboard key
 const _reverse = new Map<string, string>()
 for (const [key, noteId] of Object.entries(KEY_TO_NOTE)) {
-  _reverse.set(noteId, key === ';' ? ';' : key.toUpperCase())
+  _reverse.set(noteId, key.toUpperCase())
 }
 
 /** Returns the mapped keyboard key label for a noteId, or null if unmapped. */

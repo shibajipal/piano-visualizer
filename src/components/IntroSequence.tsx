@@ -41,7 +41,7 @@ export default function IntroSequence({ onComplete }: { onComplete: () => void }
 
   // Show skip button after 5 seconds
   useEffect(() => {
-    const timer = setTimeout(() => setShowSkip(true), 50)
+    const timer = setTimeout(() => setShowSkip(true), 3000)
     return () => clearTimeout(timer)
   }, [])
 

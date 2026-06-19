@@ -310,7 +310,7 @@ export default function App() {
             <h3>Keyboard Controls</h3>
             <p>You can play the piano using your computer keyboard!</p>
             <div className="help-grid">
-              <div className="help-key">A ... ;</div><div className="help-desc">Play middle octave (C4 - E5)</div>
+              <div className="help-key">A ... M</div><div className="help-desc">Play middle octave (C4 - E5)</div>
               <div className="help-key">W E T Y U O P</div><div className="help-desc">Play black keys</div>
               <div className="help-key">SHIFT + Key</div><div className="help-desc">Play 1 octave HIGHER</div>
               <div className="help-key">ALT + Key</div><div className="help-desc">Play 1 octave LOWER</div>
@@ -346,7 +346,7 @@ export default function App() {
       </main>
 
       <footer className="footer">
-        <span>Keys A–; → C4–E5 · Click any key · Scroll to zoom</span>
+        <span>Keys A–M → C4–E5 · Click any key · Scroll to zoom</span>
       </footer>
     </div>
   )

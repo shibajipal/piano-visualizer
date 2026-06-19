@@ -89,7 +89,7 @@ npm run build
 
 | Action | Key(s) |
 | :--- | :--- |
-| **Play Middle Octave (C4 - E5)** | `A` ... `;` (Home row) |
+| **Play Middle Octave (C4 - E5)** | `A` ... `M` (Home row) |
 | **Play Black Keys** | `W E T Y U O P` |
 | **Shift 1 Octave HIGHER** | Hold `SHIFT` + Key |
 | **Shift 1 Octave LOWER** | Hold `ALT` + Key |
