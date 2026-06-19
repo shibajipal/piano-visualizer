@@ -14,6 +14,7 @@ export default function IntroSequence({ onComplete }: { onComplete: () => void }
   const spacerRef = useRef<HTMLDivElement>(null)
   const [loadedCount, setLoadedCount] = useState(0)
   const [hasScrolled, setHasScrolled] = useState(false)
+  const [showSkip, setShowSkip] = useState(false)
   const imagesRef = useRef<HTMLImageElement[]>([])
 
   // Preload images
@@ -36,6 +37,12 @@ export default function IntroSequence({ onComplete }: { onComplete: () => void }
       images.push(img)
     }
     imagesRef.current = images
+  }, [])
+
+  // Show skip button after 5 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSkip(true), 50)
+    return () => clearTimeout(timer)
   }, [])
 
   const drawFrame = (index: number) => {
@@ -120,8 +127,15 @@ export default function IntroSequence({ onComplete }: { onComplete: () => void }
               </div>
             </div>
           )}
+
         </div>
       </div>
+
+      {showSkip && (
+        <button className="intro-skip-btn" onClick={onComplete}>
+          Skip
+        </button>
+      )}
     </div>
   )
 }

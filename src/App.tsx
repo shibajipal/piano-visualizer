@@ -171,7 +171,7 @@ export default function App() {
             <h1>Piano</h1>
             <h1>Visualizer</h1>
           </div>
-          <span className="tag">v1.1</span>
+          <span className="tag">v1.2</span>
         </div>
 
         {/* Dashboard Controls */}
@@ -335,7 +335,7 @@ export default function App() {
           <OrbitControls
             enablePan={false}
             enableRotate={manualSpin}
-            minPolarAngle={Math.PI / 4}
+            minPolarAngle={0}
             maxPolarAngle={Math.PI * 3 / 5}
             minDistance={12}
             maxDistance={120}
